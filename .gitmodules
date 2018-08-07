@@ -1,0 +1,3 @@
+[submodule "kerosene"]
+	path = kerosene
+	url = https://github.com/mcskinner/kerosene
