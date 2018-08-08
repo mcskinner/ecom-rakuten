@@ -11,5 +11,5 @@ The details of the model choices and evolution can be found in the [system descr
 
 In code, from the repository root and assuming that `rdc-catalog-train.tsv` and `rdc-catalog-test.tsv` are in a `data/` subdirectory:
 1. `./prep.sh` performs a train-validation split, tokenizes the data, builds the vocabularies, and saves the processed data back to new files in `data/`.
-1. `./train.sh model-name` trains a forward model with the default hyperparameters and training schedule, and then saves the model weights to `data/models/model-name.h5`.
+1. `./train.sh model-name` trains a forward model with the default hyperparameters and training schedule, and then saves the model weights to `data/models/model-name.h5`. To perform bi-directional ensembling, the `--reverse` flag can be used to train on a backwards version of the input sequences.
 1. Model scoring, ensembling, test set inference are not yet implemented. Soon.

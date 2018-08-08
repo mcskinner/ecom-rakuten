@@ -70,17 +70,25 @@ def save_datasets(trn_ds, val_ds):
         pickle.dump((lh, rh), pf)
 
 
-def load_datasets():
+def _reverse_all(xs):
+    return np.array([list(reversed(x)) for x in xs])
+
+
+def load_datasets(reverse=False):
     with open(DATA_PATH/'datasets.pkl', 'rb') as pf:
         lh, rh = pickle.load(pf)
     lx, ly = lh
     rx, ry = rh
+    if reverse:
+        lx, rx = _reverse_all(lx), _reverse_all(rx)
     return RakDataset(lx, ly), RakDataset(rx, ry)
 
 
-def load_test_ds(enc):
+def load_test_ds(enc, reverse=False):
     test = pd.read_csv(DATA_PATH/'rdc-catalog-test.tsv', sep='\t', header=None, names=('item',))
     test_enc = enc.encode(test.item)
+    if reverse:
+        test_enc = _reverse_all(test_enc)
     return RakDataset(test_enc, np.zeros(test_enc.shape[0]))
 
 

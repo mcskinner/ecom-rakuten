@@ -1,2 +1,4 @@
 #!/bin/sh
-python -m ecom.train -- $@
+
+MODEL=$1; shift
+python -m ecom.train $MODEL -- $@

@@ -43,6 +43,7 @@ class BalancedPoolLSTM(torch.nn.Module):
 
 def train(
     model_name,
+    reverse=False,
     n_epochs=40,
     lr=0.8,
     lr_factor=20,
@@ -53,7 +54,7 @@ def train(
 ):
     # Data loading
     enc, cenc = data.load_encoders()
-    trn_ds, val_ds = data.load_datasets()
+    trn_ds, val_ds = data.load_datasets(reverse=reverse)
     trn_enc, val_enc = trn_ds.x, val_ds.x
 
     bs = 256
