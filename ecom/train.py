@@ -6,6 +6,7 @@ from .slimai import DataLoader, SortSampler, SortishSampler
 
 from kerosene import batches, loop, optimizer, sched, torch_util
 
+import fire
 import torch
 import torch.utils.data
 import torch.nn.functional as F
@@ -40,7 +41,7 @@ class BalancedPoolLSTM(torch.nn.Module):
         return self.out(self.out_drop(x))
 
 
-def main():
+def train(n_emb=50, n_hid=512, lr=0.8, n_epochs=40, lr_factor=20, mom_hi=0.95, mom_lo=0.85):
     # Data loading
     enc, cenc = data.load_encoders()
     trn_ds, val_ds = data.load_datasets()
@@ -55,15 +56,12 @@ def main():
 
     # Training
     n_inp = len(enc.itos)
-    n_emb, n_hid = 50, 512
     n_out = len(cenc.itos)
     model = torch_util.to_gpu(BalancedPoolLSTM(n_inp, n_emb, n_hid, n_out))
 
-    lr = 0.8
-    n_epochs = 5
     n_batches = n_epochs * len(trn_dl)
     optim = optimizer.make(torch.optim.SGD, model, lr)
-    schedule = sched.one_cycle(optim, n_batches, lr_factor=20, momentums=(0.95, 0.85))
+    schedule = sched.one_cycle(optim, n_batches, lr_factor=lr_factor, momentums=(mom_hi, mom_lo))
     mgr = batches.Manager(
         model,
         optim,
@@ -77,4 +75,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    fire.Fire(train)
