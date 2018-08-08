@@ -41,7 +41,16 @@ class BalancedPoolLSTM(torch.nn.Module):
         return self.out(self.out_drop(x))
 
 
-def train(n_emb=50, n_hid=512, lr=0.8, n_epochs=40, lr_factor=20, mom_hi=0.95, mom_lo=0.85):
+def train(
+    model_name,
+    n_epochs=40,
+    lr=0.8,
+    lr_factor=20,
+    mom_hi=0.95,
+    mom_lo=0.85,
+    n_emb=50,
+    n_hid=512,
+):
     # Data loading
     enc, cenc = data.load_encoders()
     trn_ds, val_ds = data.load_datasets()
@@ -71,7 +80,7 @@ def train(n_emb=50, n_hid=512, lr=0.8, n_epochs=40, lr_factor=20, mom_hi=0.95, m
         seq_first=True,
     )
     print(loop.fit(mgr, trn_dl, val_dl, n_epochs))
-    data.save_model(model, 'kerosene-test')
+    data.save_model(model, model_name)
 
 
 if __name__ == '__main__':
