@@ -1,30 +1,14 @@
-from .slimai import to_np
-
 import numpy as np
-import torch
 import warnings
 
 from sklearn.metrics import precision_recall_fscore_support as fscore
-
-
-def accuracy(preds, targs):
-    preds = torch.max(preds, dim=1)[1]
-    return (preds == targs).float().mean()
 
 
 def score(gold, pred):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         p, r, f1, _ = fscore(gold, pred, pos_label=None, average='weighted')
-    accuracy = np.mean(gold == pred)
-    return accuracy, p, r, f1
-
-
-def score_learner(cenc, learn):
-    pred, gold = learn.predict_with_targs()
-    pred_cats = cenc.decode(pred.argmax(axis=1))
-    gold_cats = cenc.decode(gold)
-    return score(gold_cats, pred_cats)
+    return p, r, f1
 
 
 def logprob_scale(x):
@@ -64,12 +48,3 @@ def pred_from_probs(probs):
         f1 = 2*prec*rec / (prec+rec)
         pcuts[i] = ps[np.argmax(f1)]
     return pcuts
-
-
-def cut_score(the_score, val_dl):
-    gold = to_np(torch.cat([y for x, y in val_dl]))
-    probs = the_score / the_score.sum(axis=1, keepdims=True)
-    pcuts = pred_from_probs(probs)
-    probs[probs < pcuts] = 0
-    probs[:, -1] += 1e-9
-    return score(gold, np.argmax(probs, axis=1))

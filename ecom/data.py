@@ -113,3 +113,4 @@ def save_model(model, name):
 def load_model(model, name):
     state = torch.load(MODEL_PATH/f'{name}.h5', map_location=lambda s, _: s)
     model.load_state_dict(state)
+    return model
