@@ -2,7 +2,6 @@
 
 from . import bpv, data
 from .scoring import accuracy
-from .slimai import DataLoader, SortSampler, SortishSampler
 
 from kerosene import batches, loop, optimizer, sched, torch_util
 
@@ -23,19 +22,9 @@ def train(
     n_emb=50,
     n_hid=512,
 ):
-    # Data loading
     enc, cenc = data.load_encoders()
-    trn_ds, val_ds = data.load_datasets(reverse=reverse)
-    trn_enc, val_enc = trn_ds.x, val_ds.x
+    trn_dl, val_dl = data.load_dataloaders(reverse=reverse)
 
-    bs = 256
-    trn_samp = SortishSampler(trn_enc, key=lambda x: len(trn_enc[x]), bs=bs)
-    val_samp = SortSampler(val_enc, key=lambda x: len(val_enc[x]))
-
-    trn_dl = DataLoader(trn_ds, bs, transpose=True, pad_idx=0, pre_pad=False, sampler=trn_samp)
-    val_dl = DataLoader(val_ds, bs, transpose=True, pad_idx=0, pre_pad=False, sampler=val_samp)
-
-    # Training
     n_inp = len(enc.itos)
     n_out = len(cenc.itos)
     model = torch_util.to_gpu(bpv.BalancedPoolLSTM(n_inp, n_emb, n_hid, n_out))

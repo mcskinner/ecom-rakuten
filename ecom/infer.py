@@ -1,21 +1,10 @@
 from . import bpv, data, scoring
-from .slimai import DataLoader, to_np
+from .slimai import to_np
 
 from kerosene import torch_util
 
 import fire
 import numpy as np
-
-
-def test_dl():
-    bs = 256
-    test_ds = data.load_test_ds()
-    test_enc = test_ds.x
-    test_idx = sorted(range(len(test_enc)), key=lambda i: len(test_enc[i]), reverse=True)
-    blah = {idx: i for i, idx in enumerate(test_idx)}
-    test_revidx = [blah[i] for i in range(len(test_enc))]
-    test_dl = DataLoader(test_ds, bs, transpose=True, pad_idx=0, pre_pad=False, shuffle=False)
-    return test_dl, test_revidx
 
 
 def infer(model, dl, with_f1=True, is_test=False):
@@ -41,7 +30,7 @@ def main(model_file):
         model_file,
     )
 
-    _, val_dl = data.load_datasets()
+    _, val_dl = data.load_dataloaders()
     preds, targs = infer(model, val_dl)
     print(scoring.score(targs, preds))
 

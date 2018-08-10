@@ -1,4 +1,5 @@
 from . import vocab
+from .slimai import DataLoader, SortSampler, SortishSampler
 
 import collections
 import csv
@@ -84,12 +85,36 @@ def load_datasets(reverse=False):
     return RakDataset(lx, ly), RakDataset(rx, ry)
 
 
-def load_test_ds(enc, reverse=False):
+def load_dataloaders(reverse=False, bs=256):
+    enc, cenc = load_encoders()
+    trn_ds, val_ds = load_datasets(reverse=reverse)
+    trn_enc, val_enc = trn_ds.x, val_ds.x
+
+    trn_samp = SortishSampler(trn_enc, key=lambda x: len(trn_enc[x]), bs=bs)
+    val_samp = SortSampler(val_enc, key=lambda x: len(val_enc[x]))
+
+    trn_dl = DataLoader(trn_ds, bs, transpose=True, pad_idx=0, pre_pad=False, sampler=trn_samp)
+    val_dl = DataLoader(val_ds, bs, transpose=True, pad_idx=0, pre_pad=False, sampler=val_samp)
+    return trn_dl, val_dl
+
+
+def load_test_ds(reverse=False):
+    enc, _ = load_encoders()
     test = pd.read_csv(DATA_PATH/'rdc-catalog-test.tsv', sep='\t', header=None, names=('item',))
     test_enc = enc.encode(test.item)
     if reverse:
         test_enc = _reverse_all(test_enc)
     return RakDataset(test_enc, np.zeros(test_enc.shape[0]))
+
+
+def load_test_dataloader(reverse=False, bs=256):
+    test_ds = load_test_ds(reverse=reverse)
+    test_enc = test_ds.x
+    test_idx = sorted(range(len(test_enc)), key=lambda i: len(test_enc[i]), reverse=True)
+    index = {idx: i for i, idx in enumerate(test_idx)}
+    test_revidx = [index[i] for i in range(len(test_enc))]
+    test_dl = DataLoader(test_ds, bs, transpose=True, pad_idx=0, pre_pad=False, shuffle=False)
+    return test_dl, test_revidx
 
 
 def save_test_pred(cenc, pred):
