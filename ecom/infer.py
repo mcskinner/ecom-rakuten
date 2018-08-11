@@ -27,14 +27,14 @@ def predict(scores, tune_f1=False):
     return probs.argmax(axis=1)
 
 
-def main(forward='', reverse='', is_test=False, debug=False):
+def main(forward=None, reverse=None, is_test=False, debug=False):
     n_emb, n_hid = 50, 512
     enc, cenc = data.load_encoders()
     n_inp, n_out = len(enc.itos), len(cenc.itos)
 
     models_by_dir = {
-        False: forward.split(','),
-        True: reverse.split(','),
+        False: forward.split(',') if forward else [],
+        True: reverse.split(',') if reverse else [],
     }
 
     total_scores, total_targs = None, None

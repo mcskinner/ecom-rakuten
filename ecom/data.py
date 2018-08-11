@@ -118,7 +118,7 @@ def load_test_dataloader(reverse=False, bs=256):
 
 
 def save_test_pred(cenc, pred, tune_f1=False):
-    test_cats = cenc.decode(np.argmax(pred, axis=1))
+    test_cats = cenc.decode(pred)
     with open(DATA_PATH/'rdc-catalog-test.tsv') as tf:
         test_items = [l.strip('\n') for l in tf.readlines()]
     test_df = pd.DataFrame(collections.OrderedDict(item=test_items, cat=test_cats))
