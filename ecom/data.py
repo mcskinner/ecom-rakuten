@@ -117,13 +117,13 @@ def load_test_dataloader(reverse=False, bs=256):
     return test_dl, test_revidx
 
 
-def save_test_pred(cenc, pred):
+def save_test_pred(cenc, pred, tune_f1=False):
     test_cats = cenc.decode(np.argmax(pred, axis=1))
     with open(DATA_PATH/'rdc-catalog-test.tsv') as tf:
         test_items = [l.strip('\n') for l in tf.readlines()]
     test_df = pd.DataFrame(collections.OrderedDict(item=test_items, cat=test_cats))
     test_df.to_csv(
-        DATA_PATH/'test-pred.tsv',
+        DATA_PATH/'test-pred{}.tsv'.format('' if tune_f1 else '-notune'),
         sep='\t',
         header=None,
         quoting=csv.QUOTE_NONE,

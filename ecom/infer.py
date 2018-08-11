@@ -27,7 +27,7 @@ def predict(scores, tune_f1=False):
     return probs.argmax(axis=1)
 
 
-def main(forward='', reverse=''):
+def main(forward='', reverse='', is_test=False, debug=False):
     n_emb, n_hid = 50, 512
     enc, cenc = data.load_encoders()
     n_inp, n_out = len(enc.itos), len(cenc.itos)
@@ -39,25 +39,35 @@ def main(forward='', reverse=''):
 
     total_scores, total_targs = None, None
     for is_reverse, models in models_by_dir.items():
-        _, val_dl = data.load_dataloaders(is_reverse)
+        if is_test:
+            dl, revidx = data.load_test_dataloader(is_reverse)
+        else:
+            _, dl = data.load_dataloaders(is_reverse)
+
         for model_name in models:
             model = data.load_model(
                 torch_util.to_gpu(bpv.BalancedPoolLSTM(n_inp, n_emb, n_hid, n_out)),
                 model_name,
             )
 
-            scores, targs = infer(model, val_dl)
-            preds = predict(scores)
-            print(model_name, is_reverse, scoring.score(preds, targs))
+            scores, targs = infer(model, dl)
+            if debug:
+                preds = predict(scores)
+                print(model_name, is_reverse, scoring.score(preds, targs))
 
+            scores = scoring.logprob_scale(scores)
             if total_scores is None:
                 total_scores, total_targs = scores, targs
             else:
                 assert (targs == total_targs).all()
-                total_scores += scoring.logprob_scale(scores)
+                total_scores += scores
 
-    print(scoring.score(predict(total_scores), total_targs))
-    print(scoring.score(predict(scores, tune_f1=True), total_targs))
+    for tune_f1 in False, True:
+        if is_test:
+            pred = predict(total_scores, tune_f1=tune_f1)
+            print(data.save_test_pred(cenc, pred[revidx], tune_f1=tune_f1))
+        else:
+            print(scoring.score(predict(scores, tune_f1=tune_f1), total_targs))
 
 
 if __name__ == '__main__':
