@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from . import bpv, data
-from .scoring import accuracy
 
 from kerosene import batches, loop, optimizer, sched, torch_util
 
@@ -9,6 +8,11 @@ import fire
 import torch
 import torch.utils.data
 import torch.nn.functional as F
+
+
+def accuracy(preds, targs):
+    preds = torch.max(preds, dim=1)[1]
+    return (preds == targs).float().mean()
 
 
 def train(

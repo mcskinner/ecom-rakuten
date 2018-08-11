@@ -37,7 +37,19 @@ Train and save a forward model with the hyperparameters from the winning RDC sol
 Train a reverse model, intended for use in building a bi-directional ensemble with a forward network:
 
 ```
-./train-sh reverse-model --reverse
+./train.sh reverse-model --reverse
+```
+
+Train a model with some paratemers different from the default:
+
+```
+./train.sh custom-model-name --n-epochs=20 --lr=1.2
+```
+
+See a full list of parameters available to tune via flags:
+
+```
+./train.sh -- --help
 ```
 
 ### Inference, Prediction, and Scoring
@@ -72,7 +84,13 @@ Or for a larger ensemble, e.g. with 4 each forward and reverse:
 ./infer.sh --forward=fwd1,fwd2,fwd3,fwd4 --reverse=rev1,rev2,rev3,rev4
 ```
 
-To run test set inference and output prediction files:
+Since that can take awhile, you can show intermediate results along the way:
+
+```
+./infer.sh --forward=fwd1,fwd2,fwd3,fwd4 --reverse=rev1,rev2,rev3,rev4 --debug
+```
+
+To run test set inference and output prediction files for a single model, with ensembles working analogously to the commands above:
 
 ```
 ./infer.sh model-name --is-test
