@@ -40,7 +40,7 @@ Train a reverse model, intended for use in building a bi-directional ensemble wi
 ./train.sh reverse-model --reverse
 ```
 
-Train a model with some paratemers different from the default:
+Train a model with some parameters different from the default:
 
 ```
 ./train.sh custom-model-name --n-epochs=20 --lr=1.2
@@ -58,12 +58,7 @@ Run an inference on the validation set, generate predictions, and then output pr
 
 ```
 ./infer.sh model-name
-```
-
-or
-
-```
-./infer.sh --forward=model-name
+./infer.sh --forward=model-name  # equivalent
 ```
 
 Score a reverse model:
