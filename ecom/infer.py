@@ -70,7 +70,7 @@ def main(forward=None, reverse=None, is_test=False, debug=False):
             pred = predict(total_scores, tune_f1=tune_f1)
             print(data.save_test_pred(cenc, pred[revidx], tune_f1=tune_f1))
         else:
-            print(scoring.score(predict(scores, tune_f1=tune_f1), total_targs))
+            print(scoring.score(predict(total_scores, tune_f1=tune_f1), total_targs))
 
 
 if __name__ == '__main__':
