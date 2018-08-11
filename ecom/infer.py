@@ -39,14 +39,14 @@ def main(forward='', reverse=''):
 
     total_scores, total_targs = None, None
     for is_reverse, models in models_by_dir.items():
+        _, val_dl = data.load_dataloaders(is_reverse)
         for model_name in models:
-            _, val_dl = data.load_dataloaders(is_reverse)
             model = data.load_model(
                 torch_util.to_gpu(bpv.BalancedPoolLSTM(n_inp, n_emb, n_hid, n_out)),
                 model_name,
             )
-            scores, targs = infer(model, val_dl)
 
+            scores, targs = infer(model, val_dl)
             preds = predict(scores)
             print(model_name, is_reverse, scoring.score(preds, targs))
 
@@ -54,7 +54,7 @@ def main(forward='', reverse=''):
                 total_scores, total_targs = scores, targs
             else:
                 assert (targs == total_targs).all()
-                total_scores += scoring.log_softmax(scores)
+                total_scores += scoring.logprob_scale(scores)
 
     print(scoring.score(predict(total_scores), total_targs))
     print(scoring.score(predict(scores, tune_f1=True), total_targs))
