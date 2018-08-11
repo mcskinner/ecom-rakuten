@@ -37,6 +37,7 @@ def main(forward=None, reverse=None, is_test=False, debug=False):
         True: reverse.split(',') if reverse else [],
     }
 
+    n_models = 0
     total_scores, total_targs = None, None
     for is_reverse, models in models_by_dir.items():
         if is_test:
@@ -55,6 +56,7 @@ def main(forward=None, reverse=None, is_test=False, debug=False):
                 preds = predict(scores)
                 print(model_name, is_reverse, scoring.score(preds, targs))
 
+            n_models += 1
             scores = scoring.logprob_scale(scores)
             if total_scores is None:
                 total_scores, total_targs = scores, targs
@@ -62,6 +64,7 @@ def main(forward=None, reverse=None, is_test=False, debug=False):
                 assert (targs == total_targs).all()
                 total_scores += scores
 
+    total_scores /= n_models
     for tune_f1 in False, True:
         if is_test:
             pred = predict(total_scores, tune_f1=tune_f1)
