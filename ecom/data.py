@@ -122,13 +122,15 @@ def save_test_pred(cenc, pred, tune_f1=False):
     with open(DATA_PATH/'rdc-catalog-test.tsv') as tf:
         test_items = [l.strip('\n') for l in tf.readlines()]
     test_df = pd.DataFrame(collections.OrderedDict(item=test_items, cat=test_cats))
+    path = DATA_PATH/'test-pred{}.tsv'.format('' if tune_f1 else '-notune')
     test_df.to_csv(
-        DATA_PATH/'test-pred{}.tsv'.format('' if tune_f1 else '-notune'),
+        path,
         sep='\t',
         header=None,
         quoting=csv.QUOTE_NONE,
         index=False,
     )
+    return path
 
 
 def save_model(model, name):
