@@ -4,10 +4,10 @@ import warnings
 from sklearn.metrics import precision_recall_fscore_support as fscore
 
 
-def score(gold, pred):
+def score(preds, targs):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        p, r, f1, _ = fscore(gold, pred, pos_label=None, average='weighted')
+        p, r, f1, _ = fscore(targs, preds, pos_label=None, average='weighted')
     return p, r, f1
 
 
